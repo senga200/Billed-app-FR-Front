@@ -1,11 +1,24 @@
-import VerticalLayout from './VerticalLayout.js'
-import ErrorPage from "./ErrorPage.js"
-import LoadingPage from "./LoadingPage.js"
+import VerticalLayout from "./VerticalLayout.js";
+import ErrorPage from "./ErrorPage.js";
+import LoadingPage from "./LoadingPage.js";
 
-import Actions from './Actions.js'
+import Actions from "./Actions.js";
+
+// ajouter une fonction pour trier les factures par ordre croissant
+const sortBills = (bills) => {
+  // trier les factures par ordre croissant
+  return bills
+    ? bills.sort((a, b) => {
+        // convertir les dates avant de les comparer avec new date()
+        return new Date(a.date) - new Date(b.date);
+      }) // si bills est vide, retourner un tableau vide
+    : [];
+};
+
+// gere l'affichage des lignes du tableau des notes de frais et l'url du fichier de l'icone oeil coté employé
 
 const row = (bill) => {
-  return (`
+  return `
     <tr>
       <td>${bill.type}</td>
       <td>${bill.name}</td>
@@ -16,16 +29,22 @@ const row = (bill) => {
         ${Actions(bill.fileUrl)}
       </td>
     </tr>
-    `)
-  }
-
+    `;
+};
+//avant correction :
+// const rows = (data) => {
+//   return (data && data.length) ? data.map(bill => row(bill)).join("") : ""
+// }
+//après correction :
 const rows = (data) => {
-  return (data && data.length) ? data.map(bill => row(bill)).join("") : ""
-}
-
+  // trier les factures par ordre croissant
+  const sortedBills = sortBills(data);
+  // retourner les lignes du tableau
+  return sortedBills.map((bill) => row(bill)).join("");
+};
+// gere l'affichage du modal
 export default ({ data: bills, loading, error }) => {
-  
-  const modal = () => (`
+  const modal = () => `
     <div class="modal fade" id="modaleFile" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
@@ -40,15 +59,15 @@ export default ({ data: bills, loading, error }) => {
         </div>
       </div>
     </div>
-  `)
+  `;
 
   if (loading) {
-    return LoadingPage()
+    return LoadingPage();
   } else if (error) {
-    return ErrorPage(error)
+    return ErrorPage(error);
   }
-  
-  return (`
+
+  return `
     <div class='layout'>
       ${VerticalLayout(120)}
       <div class='content'>
@@ -75,6 +94,5 @@ export default ({ data: bills, loading, error }) => {
         </div>
       </div>
       ${modal()}
-    </div>`
-  )
-}
+    </div>`;
+};
