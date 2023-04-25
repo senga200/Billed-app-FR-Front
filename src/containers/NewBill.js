@@ -67,13 +67,17 @@ export default class NewBill {
       })
       .catch((error) => console.error(error));
   };
+
+  //TEST 1 : vérifie que le formulaire est bien soumis
+  //fonction appelée lors de la soumission du formulaire
   handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault(); // empeche le "rafraichissement" de la page lors de la soumission du formulaire
     console.log(
       'e.target.querySelector(`input[data-testid="datepicker"]`).value',
       e.target.querySelector(`input[data-testid="datepicker"]`).value
     );
     const email = JSON.parse(localStorage.getItem("user")).email;
+    //récup mail, et bill contient toutes les données ci dessous
     const bill = {
       email,
       type: e.target.querySelector(`select[data-testid="expense-type"]`).value,
@@ -92,11 +96,12 @@ export default class NewBill {
       fileName: this.fileName,
       status: "pending",
     };
-    this.updateBill(bill);
-    this.onNavigate(ROUTES_PATH["Bills"]);
+    this.updateBill(bill); // bill en parametres pour mettre à jour la facture
+    this.onNavigate(ROUTES_PATH["Bills"]); // on se redirige vers la page des bills
   };
 
   // not need to cover this function by tests
+  /*istanbul ignore next*/
   updateBill = (bill) => {
     if (this.store) {
       this.store
