@@ -23,6 +23,7 @@ export default class NewBill {
     new Logout({ document, localStorage, onNavigate }); // on appelle la classe Logout pour pouvoir se déconnecter
   }
   // fonction qui gére le téléchargement du fichier et l'envoi des données du formulaire au serveur
+  //test 2
   handleChangeFile = (e) => {
     e.preventDefault();
     const file = this.document.querySelector(`input[data-testid="file"]`)
@@ -51,21 +52,24 @@ export default class NewBill {
       return false;
     }
     //FIN bug fichier
+    // on envoie le fichier au serveur
     this.store
+      // on appelle la fonction bills du store pour créer une nouvelle facture
       .bills()
+      // on appelle la fonction create du store pour créer une nouvelle facture
       .create({
         data: formData,
         headers: {
           noContentType: true,
         },
-      })
+      }) // on récupère l'url du fichier et la clé de la facture
       .then(({ fileUrl, key }) => {
-        console.log(fileUrl);
-        this.billId = key;
-        this.fileUrl = fileUrl;
-        this.fileName = fileName;
+        console.log(fileUrl); // on affiche l'url du fichier dans la console
+        this.billId = key; // on stocke la clé de la facture
+        this.fileUrl = fileUrl; // on stocke l'url du fichier
+        this.fileName = fileName; // on stocke le nom du fichier
       })
-      .catch((error) => console.error(error));
+      .catch((error) => console.error(error)); // si erreur, on affiche l'erreur dans la console
   };
 
   //TEST 1 : vérifie que le formulaire est bien soumis
