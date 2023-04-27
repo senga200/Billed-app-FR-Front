@@ -53,6 +53,7 @@ export default class NewBill {
     }
     //FIN bug fichier
     // on envoie le fichier au serveur
+    //TEST 3 : vérifie que le fichier est bien envoyé au serveur à faire
     this.store
       // on appelle la fonction bills du store pour créer une nouvelle facture
       .bills()

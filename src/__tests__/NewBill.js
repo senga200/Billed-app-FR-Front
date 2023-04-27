@@ -151,4 +151,8 @@ describe("I am an employee and I create a new bill", () => {
     // On vérifie que le champ est bien vide (puisque pas le bon format)
     expect(fileField.value).toBe("");
   });
+
+  // TEST 3 : test si erreur, error est bien appelée
 });
+
+//test 4 : test de la fonction create() de NewBill.js (fonction qui permet de créer une note de frais)

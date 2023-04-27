@@ -27,7 +27,7 @@ export default class {
     // fonction qui permet de naviguer vers la page NewBill
     this.onNavigate(ROUTES_PATH["NewBill"]);
   };
-
+  //test 2
   handleClickIconEye = (icon) => {
     // fonction qui permet d'afficher la facture dans une modale
     const billUrl = icon.getAttribute("data-bill-url"); // on récupère l'url de la facture
