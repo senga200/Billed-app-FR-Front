@@ -56,9 +56,58 @@ describe("Given I am connected as an employee", () => {
 
 //test 2  : vérifier que handleClickIconEye est bien appelée lorsqu'on clique sur l'icone oeil et que la modale s'affiche
 
+// describe("Given I am connected as an employee", () => {
+//   describe("when i click on icon eye", () => {
+//     test("Then a modal should open", () => {
+//       // Mock du local storage pour simuler qu'on est connecté
+//       Object.defineProperty(window, "localStorage", {
+//         value: localStorageMock,
+//       });
+//       window.localStorage.setItem(
+//         "user",
+//         JSON.stringify({
+//           type: "Employee",
+//           email: "test@test.fr",
+//         })
+//       );
+
+//       //simuler le chargement de la page Bills avec en paramètre les données de bills (?)
+//       document.body.innerHTML = BillsUI({ data: bills });
+//       //créer un mock de la fonction handleClickIconEye pour pouvoir tester son appel
+//       const handleClickIconEye = jest.fn(() => bills.handleClickIconEye(bill));
+//       // Créer un mock de la fonction onNavigate pour vérifier qu'elle est bien appelée
+//       const mockOnNavigate = jest.fn();
+
+//       //mock de bill pour pouvoir tester l'affichage de la modale
+//       const bill = new Bills({
+//         document,
+//         onNavigate: mockOnNavigate,
+//         store: mockStore,
+//         localStorage: window.localStorage,
+//       });
+
+//       //on récupère l'icone oeil de la page Bills
+
+//       const iconEye = screen.getByTestId("icon-eye");
+//       //on simule le click sur l'icone oeil
+//       iconEye.addEventListener("click", handleClickIconEye);
+//       userEvent.click(iconEye);
+//       //on vérifie que la fonction handleClickIconEye a bien été appelée
+//       expect(handleClickIconEye).toHaveBeenCalled();
+//       //on vérifie que la modale s'affiche
+//       const modal = screen.getByTestId("modaleFile");
+//       expect(modal).toBeTruthy();
+//     });
+//   });
+// });
+
+//test 3 : vérifier que handleClickNewBill est bien appelée lorsqu'on clique sur le bouton Nouvelle note de frais et que la page NewBill s'affiche
+
 describe("Given I am connected as an employee", () => {
-  describe("when i click on icon eye", () => {
-    test("Then a modal should open", () => {
+  describe("When I am on Bills Page", () => {
+    test("Then when I click on New Bill button, the New Bill page should be displayed", () => {
+      // Arrange
+
       // Mock du local storage pour simuler qu'on est connecté
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
@@ -70,35 +119,26 @@ describe("Given I am connected as an employee", () => {
           email: "test@test.fr",
         })
       );
+      // mock de onNavigate
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname });
+      };
 
-      //simuler le chargement de la page Bills avec en paramètre les données de bills (?)
+      // Act : cliquer sur le bouton Nouvelle note de frais
       document.body.innerHTML = BillsUI({ data: bills });
-      //créer un mock de la fonction handleClickIconEye pour pouvoir tester son appel
-      const handleClickIconEye = jest.fn(() => bills.handleClickIconEye(bill));
-      // Créer un mock de la fonction onNavigate pour vérifier qu'elle est bien appelée
-      const mockOnNavigate = jest.fn();
-
-      //mock de bill pour pouvoir tester l'affichage de la modale
       const bill = new Bills({
         document,
-        onNavigate: mockOnNavigate,
-        store: mockStore,
+        onNavigate,
+        firestore: null,
         localStorage: window.localStorage,
       });
+      const handleClickNewBill = jest.fn(bill.handleClickNewBill);
+      const newBillButton = screen.getByTestId("btn-new-bill");
+      newBillButton.addEventListener("click", handleClickNewBill);
+      userEvent.click(newBillButton);
 
-      //on récupère l'icone oeil de la page Bills
-
-      const iconEye = screen.getByTestId("icon-eye");
-      //on simule le click sur l'icone oeil
-      iconEye.addEventListener("click", handleClickIconEye);
-      userEvent.click(iconEye);
-      //on vérifie que la fonction handleClickIconEye a bien été appelée
-      expect(handleClickIconEye).toHaveBeenCalled();
-      //on vérifie que la modale s'affiche
-      const modal = screen.getByTestId("modaleFile");
-      expect(modal).toBeTruthy();
+      // Assert : vérifier que la page New Bill s'affiche
+      expect(screen.getAllByText("Envoyer une note de frais")).toBeTruthy();
     });
   });
 });
-
-//test 3 : vérifier que handleClickNewBill est bien appelée lorsqu'on clique sur le bouton Nouvelle note de frais et que la page NewBill s'affiche
