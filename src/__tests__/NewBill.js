@@ -155,4 +155,6 @@ describe("I am an employee and I create a new bill", () => {
   // TEST 3 : test si erreur, error est bien appelée
 });
 
-//test 4 : test de la fonction create() de NewBill.js (fonction qui permet de créer une note de frais)
+//test 4 : vérifier que si la promesse est rejetée, la fonction error est bien appelée et que l'alerte est bien affichée dans la console
+
+// test d'intégration GET

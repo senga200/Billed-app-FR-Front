@@ -28,6 +28,7 @@ export default class {
     this.onNavigate(ROUTES_PATH["NewBill"]);
   };
   //test 2
+  // icon en parametre car on veut tester le click sur l'icone alors que sur Dashboard on teste le click sur le bouton
   handleClickIconEye = (icon) => {
     // fonction qui permet d'afficher la facture dans une modale
     const billUrl = icon.getAttribute("data-bill-url"); // on récupère l'url de la facture

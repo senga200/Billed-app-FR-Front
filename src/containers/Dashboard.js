@@ -14,8 +14,8 @@ export const filteredBills = (data, status) => {
         if (typeof jest !== "undefined") {
           selectCondition = bill.status === status;
         } else {
-        /* istanbul ignore next */
           // in prod environment
+          /* istanbul ignore next */
           const userEmail = JSON.parse(localStorage.getItem("user")).email;
           selectCondition =
             bill.status === status &&
