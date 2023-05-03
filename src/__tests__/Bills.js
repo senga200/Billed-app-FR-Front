@@ -18,7 +18,7 @@ jest.mock("../app/store", () => mockStore);
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
-    //TEST 1 B OK
+    //**************TEST 1 B ******************//
     test("Then bill icon in vertical layout should be highlighted", async () => {
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
@@ -39,7 +39,7 @@ describe("Given I am connected as an employee", () => {
       //to-do write expect expression
       expect(windowIcon).toBeTruthy();
     });
-    //TEST 2 B OK
+    //**************TEST 2 B ******************//
     test("Then bills should be ordered from earliest to latest", () => {
       document.body.innerHTML = BillsUI({ data: bills });
       const dates = screen
@@ -55,11 +55,11 @@ describe("Given I am connected as an employee", () => {
   });
 });
 
-//test 3 B : vérifier que handleClickIconEye est bien appelée lorsqu'on clique sur l'icone oeil et que la modale s'affiche
+//**************TEST 3 B ******************//
+//vérifier que handleClickIconEye est bien appelée lorsqu'on clique sur l'icone oeil et que la modale s'affiche
 
 describe("Given I am connected as an employee", () => {
   describe("when i click on icon eye", () => {
-    //KO
     test("Then a modal should open", () => {
       // Mock du local storage pour simuler qu'on est connecté
       Object.defineProperty(window, "localStorage", {
@@ -74,6 +74,8 @@ describe("Given I am connected as an employee", () => {
       );
       // Créer un mock de la fonction onNavigate pour vérifier qu'elle est bien appelée
       const mockOnNavigate = jest.fn();
+      //mock de la modale
+      $.fn.modal = jest.fn();
 
       //mock de bill pour pouvoir tester l'affichage de la modale
       const bill = new Bills({
@@ -83,11 +85,9 @@ describe("Given I am connected as an employee", () => {
         localStorage: window.localStorage,
       });
 
-      //simuler le chargement de la page Bills avec en paramètre les données de bills (?)
       document.body.innerHTML = BillsUI({ data: bills });
 
       //on récupère l'icone oeil de la page Bills
-
       const iconEye = screen.getAllByTestId("icon-eye")[0];
       //créer un mock de la fonction handleClickIconEye pour pouvoir tester son appel
       const handleClickIconEye = jest.fn(() =>
@@ -99,109 +99,18 @@ describe("Given I am connected as an employee", () => {
 
       //on vérifie que la fonction handleClickIconEye a bien été appelée
       expect(handleClickIconEye).toHaveBeenCalled();
-      //on vérifie que la modale s'affiche
-      const modal = screen.getByTestId("modaleFile");
-      expect(modal).toBeTruthy();
+
+      // Vérifie que la modale est bien visible
+      expect($.fn.modal).toHaveBeenCalled();
     });
   });
 });
 
-// describe("Given I am connected as an employee", () => {
-//   describe("when i click on icon eye", () => {
-//     //KO
-
-//     test("Then a modal should open", () => {
-//       // Créer un mock de la fonction onNavigate pour vérifier qu'elle est bien appelée
-//       const mockOnNavigate = (pathname) => {
-//         document.body.innerHTML = ROUTES({ pathname });
-//       };
-//       // Mock du local storage pour simuler qu'on est connecté
-//       Object.defineProperty(window, "localStorage", {
-//         value: localStorageMock,
-//       });
-
-//       window.localStorage.setItem(
-//         "user",
-//         JSON.stringify({
-//           type: "Employee",
-//           email: "test@test.fr",
-//         })
-//       );
-
-//       //mock de bill pour pouvoir tester l'affichage de la modale
-//       const bill = new Bills({
-//         document,
-//         mockOnNavigate,
-//         store: mockStore,
-//         localStorage: window.localStorage,
-//       });
-
-//       //simuler le chargement de la page Bills avec en paramètre les données de bills (?)
-//       document.body.innerHTML = BillsUI({ data: bills });
-
-//       //on récupère l'icone oeil de la page Bills
-
-//       const iconEyes = screen.getAllByTestId("icon-eye");
-//       //créer un mock de la fonction handleClickIconEye pour pouvoir tester son appel
-//       const handleClickIconEye = jest.fn(bill.handleClickIconEye);
-//       const modal = document.getElementById("modaleFile");
-//       //$.fn.modal = jest.fn(() => modal.classList.add("show")); //mock de la modale Bootstrap
-
-//       //on simule le click sur l'icone oeil
-//       iconEyes.addEventListener("click", () => handleClickIconEye(iconEyes));
-//       userEvent.click(iconEyes);
-
-//       //on vérifie que la fonction handleClickIconEye a bien été appelée
-//       expect(handleClickIconEye).toHaveBeenCalled();
-//       //on vérifie que la modale s'affiche
-//       //const modal = screen.getByTestId("modaleFile");
-//       expect(modal).toBeTruthy();
-//     });
-//   });
-// });
-
-// describe("Given I am connected as employe", () => {
-//   describe("When I click on the icon eye", () => {
-//     //KO
-//     test("A modal should open", () => {
-//       // Mock du local storage pour simuler qu'on est connecté
-//       Object.defineProperty(window, "localStorage", {
-//         value: localStorageMock,
-//       });
-//       window.localStorage.setItem(
-//         "user",
-//         JSON.stringify({
-//           type: "employee",
-//         })
-//       );
-//       // Simuler le chargement de la page Bills avec en paramètre les données de bills
-//       document.body.innerHTML = BillsUI(bills[0]);
-//       const mockOnNavigate = jest.fn();
-//       const bill = new Bills({
-//         document,
-//         onNavigate: mockOnNavigate,
-//         store: mockStore,
-//         localStorage: window.localStorage,
-//       });
-//       const handleClickIconEye = jest.fn(bill.handleClickIconEye);
-//       const eye = screen.getByTestId("icon-eye");
-//       eye.addEventListener("click", handleClickIconEye);
-//       userEvent.click(eye);
-//       expect(handleClickIconEye).toHaveBeenCalled();
-
-//       const modale = screen.getByTestId("modaleFile");
-//       expect(modale).toBeTruthy();
-//     });
-//   });
-// });
-
+//**************TEST 4 B ******************//
 // TEST 4 B: vérifier que la fonction handleClickNewBill est bien appelée lorsqu'on clique sur le bouton Nouvelle note de frais et que la page NewBill s'affiche
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
-    //OK
     test("Then when I click on New Bill button, the New Bill page should be displayed", () => {
-      // Arrange
-
       // Mock du local storage pour simuler qu'on est connecté
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
@@ -218,7 +127,7 @@ describe("Given I am connected as an employee", () => {
         document.body.innerHTML = ROUTES({ pathname });
       };
 
-      // Act : cliquer sur le bouton Nouvelle note de frais
+      //cliquer sur le bouton Nouvelle note de frais
       document.body.innerHTML = BillsUI({ data: bills });
       const bill = new Bills({
         document,
@@ -226,20 +135,19 @@ describe("Given I am connected as an employee", () => {
         firestore: null,
         localStorage: window.localStorage,
       });
+      //créer un mock de la fonction handleClickNewBill pour pouvoir tester son appel
       const handleClickNewBill = jest.fn(bill.handleClickNewBill);
+      //on récupère le bouton Nouvelle note de frais
       const newBillButton = screen.getByTestId("btn-new-bill");
+      //on simule le click sur le bouton Nouvelle note de frais
       newBillButton.addEventListener("click", handleClickNewBill);
+      //on vérifie que la fonction handleClickNewBill a bien été appelée
       userEvent.click(newBillButton);
-
-      // Assert : vérifier que la page New Bill s'affiche
+      //on s'attends à ce que la page New Bill s'affiche
       expect(screen.getAllByText("Envoyer une note de frais")).toBeTruthy();
     });
   });
 });
-
-//test 5 b : recuperation de l'erreur dans la console si la fonction formDate est defaillante, enregistre l'erreur dans le catch et envoie une date non formattée
-
-// test.only("should log error and return unformatted date if formatDate fails")
 
 // //test d'integration GET
 describe("Given I am a user connected as employee", () => {
@@ -258,12 +166,6 @@ describe("Given I am a user connected as employee", () => {
       //vérifier que le tableau des factures s'affiche bien
 
       expect(bills).toBeTruthy();
-
-      //const contentPending = await screen.getByText("En attente (1)");
-      //expect(contentPending).toBeTruthy();
-      //const contentRefused = await screen.getByText("Refusé (2)");
-      //expect(contentRefused).toBeTruthy();
-      //expect(screen.getByTestId("big-billed-icon")).toBeTruthy();
     });
     describe("When an error occurs on API", () => {
       beforeEach(() => {

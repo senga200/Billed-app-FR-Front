@@ -7,26 +7,12 @@ import NewBillUI from "../views/NewBillUI.js";
 import NewBill from "../containers/NewBill.js";
 //ajout de :
 import userEvent from "@testing-library/user-event";
-import DashboardFormUI from "../views/DashboardFormUI.js";
-import DashboardUI from "../views/DashboardUI.js";
-import Dashboard, { filteredBills, cards } from "../containers/Dashboard.js";
-import { bills } from "../fixtures/bills";
-import Logout from "./Logout.js";
-import { waitFor, fireEvent } from "@testing-library/dom";
+import { fireEvent } from "@testing-library/dom";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import mockStore from "../__mocks__/store";
-import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
+import { ROUTES_PATH } from "../constants/routes.js";
 import BillsUI from "../views/BillsUI.js";
 import router from "../app/Router.js";
-// describe("Given I am connected as an employee", () => {
-//   describe("When I am on NewBill Page", () => {
-//     test("Then ...", () => {
-//       const html = NewBillUI()
-//       document.body.innerHTML = html
-//       //to-do write assertion
-//     })
-//   })
-// })
 
 jest.mock("../app/store", () => mockStore);
 
@@ -36,12 +22,12 @@ describe("I am an employee and I create a new bill", () => {
   beforeEach(() => {
     // Réinitialisation du local storage
     window.localStorage.clear();
-
     // Suppression du contenu du body
     document.body.innerHTML = "";
   });
 
-  // TEST 1 : Comportement attendu lorsque l'utilisateur remplit le formulaire de création d'une nouvelle note de frais avec des données valides et qu'il clique sur le bouton de validation
+  //**************TEST 1 NB ******************//
+  //Comportement attendu lorsque l'utilisateur remplit le formulaire de création d'une nouvelle note de frais avec des données valides et qu'il clique sur le bouton de validation
   test("Then it should create a new bill when all is correct", () => {
     // Mock du local storage pour simuler qu'on est connecté
     Object.defineProperty(window, "localStorage", {
@@ -54,7 +40,6 @@ describe("I am an employee and I create a new bill", () => {
         email: "e-mail@test.fr",
       })
     );
-
     // Simuler le chargement de la page NewBill avec la fonction NewBillUI
     document.body.innerHTML = NewBillUI();
 
@@ -92,6 +77,7 @@ describe("I am an employee and I create a new bill", () => {
       target: { value: "" },
     });
 
+    // Créer un mock de la fonction handleSubmit pour vérifier qu'elle est bien appelée
     const handleSubmit = jest.fn((e) => newBill.handleSubmit(e));
 
     // Récupérer le formulaire et ajouter un event listener sur le submit pour appeler la fonction handleSubmit
@@ -107,8 +93,8 @@ describe("I am an employee and I create a new bill", () => {
     // On s'attend à ce que la fonction onNavigate soit appelée avec la bonne route
     expect(mockOnNavigate).toHaveBeenCalledWith(ROUTES_PATH["Bills"]);
   });
-
-  // TEST 2 : Comportement attendu lorsque l'utilisateur essaye de créer une note de frais avec un fichier ayant une extension invalide
+  //**************TEST 2 NB ******************//
+  // Comportement attendu lorsque l'utilisateur essaye de créer une note de frais avec un fichier ayant une extension invalide
   test("Then it should not create a new bill when the file is wrong ext", () => {
     // Mock du local storage pour simuler qu'on est connecté en tant qu'employé
     Object.defineProperty(window, "localStorage", {
@@ -161,7 +147,9 @@ describe("I am an employee and I create a new bill", () => {
 //test integration
 describe("When an error occurs on API", () => {
   beforeEach(() => {
+    // Réinitialisation du local storage
     jest.spyOn(mockStore, "bills");
+    // définir le contenu du local storage pour simuler qu'on est connecté
     Object.defineProperty(window, "localStorage", {
       value: localStorageMock,
     });
@@ -172,13 +160,16 @@ describe("When an error occurs on API", () => {
         email: "a@a",
       })
     );
+    // Ajouter un div avec l'id root pour y ajouter le contenu de la page
     const root = document.createElement("div");
     root.setAttribute("id", "root");
     document.body.appendChild(root);
+    // Charger le router
     router();
   });
 
   test("fetches messages from an API and fails with 500 message error", async () => {
+    // retourne une erreur 500 si la fonction list est appelée grâce au mock de bills dans le store
     mockStore.bills.mockImplementationOnce(() => {
       return {
         list: () => {
@@ -186,10 +177,15 @@ describe("When an error occurs on API", () => {
         },
       };
     });
+    // Naviguer vers la page Bills
     window.onNavigate(ROUTES_PATH.NewBill);
+    // Attendre que la promesse soit rejetée
     await new Promise(process.nextTick);
+    // Afficher le message d'erreur dans le document body
     document.body.innerHTML = BillsUI({ error: "Erreur 500" });
+    // déclarer une variable "message" qui récupère le message d'erreur
     const message = screen.getByText(/Erreur 500/);
+    // s'attend à ce que le message soit affiché
     expect(message).toBeTruthy();
   });
   test("fetches messages from an API and fails with 404 message error", async () => {
