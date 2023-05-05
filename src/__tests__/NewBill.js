@@ -10,7 +10,7 @@ import userEvent from "@testing-library/user-event";
 import { fireEvent } from "@testing-library/dom";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import mockStore from "../__mocks__/store";
-import { ROUTES_PATH } from "../constants/routes.js";
+import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import BillsUI from "../views/BillsUI.js";
 import router from "../app/Router.js";
 
@@ -28,7 +28,8 @@ describe("I am an employee and I create a new bill", () => {
 
   //**************TEST 1 NB ******************//
   //Comportement attendu lorsque l'utilisateur remplit le formulaire de création d'une nouvelle note de frais avec des données valides et qu'il clique sur le bouton de validation
-  test("Then it should create a new bill when all is correct", () => {
+
+  test("Then it should create a new bill when all is correct  ", () => {
     // Mock du local storage pour simuler qu'on est connecté
     Object.defineProperty(window, "localStorage", {
       value: localStorageMock,
@@ -93,6 +94,7 @@ describe("I am an employee and I create a new bill", () => {
     // On s'attend à ce que la fonction onNavigate soit appelée avec la bonne route
     expect(mockOnNavigate).toHaveBeenCalledWith(ROUTES_PATH["Bills"]);
   });
+
   //**************TEST 2 NB ******************//
   // Comportement attendu lorsque l'utilisateur essaye de créer une note de frais avec un fichier ayant une extension invalide
   test("Then it should not create a new bill when the file is wrong ext", () => {
@@ -201,5 +203,72 @@ describe("When an error occurs on API", () => {
     document.body.innerHTML = BillsUI({ error: "Erreur 404" });
     const message = screen.getByText(/Erreur 404/);
     expect(message).toBeTruthy();
+  });
+});
+
+//Test d'intégration POST
+describe("Given I submit the new bill", () => {
+  test("Then the bill is added", async () => {
+    // Mock du local storage pour simuler qu'on est connecté en tant qu'employé
+    Object.defineProperty(window, "localStorage", {
+      value: localStorageMock,
+    });
+    window.localStorage.setItem(
+      "user",
+      JSON.stringify({
+        type: "Employee",
+        email: "azerty@email.com",
+      })
+    );
+    // Simuler le chargement de la page NewBill avec la fonction NewBillUI
+    document.body.innerHTML = NewBillUI();
+
+    const onNavigate = (pathname) => {
+      document.body.innerHTML = ROUTES({ pathname });
+    };
+
+    // creer un mock de NewBill
+    const newBill = new NewBill({
+      document,
+      onNavigate,
+      store: null,
+      localStorage: window.localStorage,
+    });
+    // simuler une facture valide
+    const validityBill = {
+      type: "transport",
+      name: "test",
+      date: "2023-05-01",
+      amount: 200,
+      vat: 20,
+      pct: 10,
+      commentary: "test",
+      fileUrl: "/test.jpg",
+      fileName: "test.jpg",
+      status: "pending",
+    };
+
+    // Charger les valeurs dans les champs de la facture valide
+    screen.getByTestId("expense-type").value = validityBill.type;
+    screen.getByTestId("expense-name").value = validityBill.name;
+    screen.getByTestId("datepicker").value = validityBill.date;
+    screen.getByTestId("amount").value = validityBill.amount;
+    screen.getByTestId("vat").value = validityBill.vat;
+    screen.getByTestId("pct").value = validityBill.pct;
+    screen.getByTestId("commentary").value = validityBill.commentary;
+
+    newBill.fileName = validityBill.fileName;
+    newBill.fileUrl = validityBill.fileUrl;
+    // simuler le click sur le bouton submit et l'envoi du formulaire
+    newBill.updateBill = jest.fn();
+    const handleSubmit = jest.fn((e) => newBill.handleSubmit(e));
+
+    // Récupérer le formulaire et ajouter un event listener sur le submit pour appeler la fonction handleSubmit
+    const form = screen.getByTestId("form-new-bill");
+    form.addEventListener("submit", handleSubmit);
+    fireEvent.submit(form);
+    // On s'attend à ce que la fonction handleSubmit soit appelée et la fonction updateBill
+    expect(handleSubmit).toHaveBeenCalled();
+    expect(newBill.updateBill).toHaveBeenCalled();
   });
 });
