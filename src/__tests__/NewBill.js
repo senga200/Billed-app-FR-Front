@@ -9,6 +9,8 @@ import NewBill from "../containers/NewBill.js";
 import userEvent from "@testing-library/user-event";
 import { fireEvent } from "@testing-library/dom";
 import { localStorageMock } from "../__mocks__/localStorage.js";
+import Logout from "../containers/Logout.js";
+
 import mockStore from "../__mocks__/store";
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import BillsUI from "../views/BillsUI.js";
@@ -140,13 +142,71 @@ describe("I am an employee and I create a new bill", () => {
     // On vérifie que le champ est bien vide (puisque pas le bon format)
     expect(fileField.value).toBe("");
   });
-
-  // TEST 3 : test si erreur, error est bien appelée
 });
 
-//test 4 : vérifier que si la promesse est rejetée, la fonction error est bien appelée et que l'alerte est bien affichée dans la console
+//**************TEST 3 NB ******************//
+//test pour vérifier que si les champs obligatoires ne sont pas remplis, le formulaire n'est pas soumis et un message d'erreur s'affiche
 
-//test integration
+describe("When I am on NewBill Page and I submit the form with empty fields", () => {
+  test("Then, it should not create a new bill and an error message should be displayed", () => {
+    // Mock du local storage pour simuler qu'on est connecté en tant qu'employé
+    Object.defineProperty(window, "localStorage", {
+      value: localStorageMock,
+    });
+    window.localStorage.setItem(
+      "user",
+      JSON.stringify({
+        type: "Employee",
+        email: "test@test.fr",
+      })
+    );
+
+    // On ajoute un div root
+    const root = document.createElement("div");
+    root.setAttribute("id", "root");
+    document.body.append(root);
+    // On charge le router pour naviguer ensuite
+    router();
+
+    // On se place sur la page de création d'une note de frais
+    window.onNavigate(ROUTES_PATH.NewBill);
+
+    // Simuler la saisie des champs obligatoires
+    fireEvent.change(screen.getByTestId("expense-type"), {
+      target: { value: "" },
+    });
+    fireEvent.change(screen.getByTestId("expense-name"), {
+      target: { value: "" },
+    });
+    fireEvent.change(screen.getByTestId("datepicker"), {
+      target: { value: "" },
+    });
+    fireEvent.change(screen.getByTestId("amount"), {
+      target: { value: "" },
+    });
+    fireEvent.change(screen.getByTestId("vat"), {
+      target: { value: "" },
+    });
+    fireEvent.change(screen.getByTestId("pct"), {
+      target: { value: "" },
+    });
+    fireEvent.change(screen.getByTestId("commentary"), {
+      target: { value: "" },
+    });
+
+    // On crée un mock pour vérifier que la fonction d'alerte est bien appelée
+    const alerting = jest.spyOn(window, "alert").mockImplementation(() => {});
+
+    // On récupère le formulaire et on le soumet
+    const form = screen.getByTestId("form-new-bill");
+    fireEvent.submit(form);
+
+    // On vérifie que l'alerte est bien appelée avec le message automatique de validation des champs
+    expect(alerting).toHaveBeenCalled();
+  });
+});
+
+//*************TEST INTEGRATION NB ERREUR 500 ET 404 ****************//
 describe("When an error occurs on API", () => {
   beforeEach(() => {
     // Réinitialisation du local storage
@@ -206,7 +266,7 @@ describe("When an error occurs on API", () => {
   });
 });
 
-//Test d'intégration POST
+//*************Test d'intégration POST ****************//
 describe("Given I submit the new bill", () => {
   test("Then the bill is added", async () => {
     // Mock du local storage pour simuler qu'on est connecté en tant qu'employé
@@ -270,5 +330,7 @@ describe("Given I submit the new bill", () => {
     // On s'attend à ce que la fonction handleSubmit soit appelée et la fonction updateBill
     expect(handleSubmit).toHaveBeenCalled();
     expect(newBill.updateBill).toHaveBeenCalled();
+    // on s'attend à ce que le statut de la facture soit "pending"
+    expect(validityBill.status).toBe("pending");
   });
 });

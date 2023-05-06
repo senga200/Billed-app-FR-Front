@@ -105,9 +105,64 @@ describe("Given I am connected as an employee", () => {
     });
   });
 });
-
 //**************TEST 4 B ******************//
-// TEST 4 B: vérifier que la fonction handleClickNewBill est bien appelée lorsqu'on clique sur le bouton Nouvelle note de frais et que la page NewBill s'affiche
+//vérifier que lorsqu'on clique sur la fermeture de la modale, celle ci disparait
+describe("Given I am connected as an employee", () => {
+  describe("when I click on icon eye and then on the close button", () => {
+    test("Then the modal should disappear", () => {
+      // Mock du local storage pour simuler qu'on est connecté
+      Object.defineProperty(window, "localStorage", {
+        value: localStorageMock,
+      });
+      window.localStorage.setItem(
+        "user",
+        JSON.stringify({
+          type: "Employee",
+          email: "test@test.fr",
+        })
+      );
+      // Créer un mock de la fonction onNavigate pour vérifier qu'elle est bien appelée
+      const mockOnNavigate = jest.fn();
+      //mock de la modale
+      $.fn.modal = jest.fn();
+
+      //mock de bill pour pouvoir tester l'affichage de la modale
+      const bill = new Bills({
+        document,
+        onNavigate: mockOnNavigate,
+        store: mockStore,
+        localStorage: window.localStorage,
+      });
+
+      document.body.innerHTML = BillsUI({ data: bills });
+
+      //on récupère l'icone oeil de la page Bills
+      const iconEye = screen.getAllByTestId("icon-eye")[0];
+      //créer un mock de la fonction handleClickIconEye pour pouvoir tester son appel
+      const handleClickIconEye = jest.fn(() =>
+        bill.handleClickIconEye(iconEye)
+      );
+      //on simule le click sur l'icone oeil
+      iconEye.addEventListener("click", handleClickIconEye);
+      userEvent.click(iconEye);
+
+      //on récupère le bouton pour fermer la modale
+      const closeModalBtn = screen.getByLabelText("Close");
+
+      //on vérifie que la modale est bien visible après avoir cliqué sur l'icône oeil
+      expect($.fn.modal).toHaveBeenCalled();
+
+      //on simule le click sur le bouton pour fermer la modale
+      closeModalBtn.click();
+
+      //on vérifie que la modale est bien cachée après avoir cliqué sur le bouton pour fermer la modale
+      expect($.fn.modal).toHaveBeenCalled();
+    });
+  });
+});
+
+//**************TEST 5 B ******************//
+// TEST 5 B: vérifier que la fonction handleClickNewBill est bien appelée lorsqu'on clique sur le bouton Nouvelle note de frais et que la page NewBill s'affiche
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
     test("Then when I click on New Bill button, the New Bill page should be displayed", () => {
