@@ -79,6 +79,12 @@ describe("I am an employee and I create a new bill", () => {
     fireEvent.change(screen.getByTestId("commentary"), {
       target: { value: "" },
     });
+    // Simuler l'upload d'un fichier avec une extension valide
+    const file = new File(["file.jpg"], "file.jpg", {
+      type: "image/jpeg",
+    });
+    const fileField = screen.getByTestId("file");
+    userEvent.upload(fileField, file);
 
     // Créer un mock de la fonction handleSubmit pour vérifier qu'elle est bien appelée
     const handleSubmit = jest.fn((e) => newBill.handleSubmit(e));
